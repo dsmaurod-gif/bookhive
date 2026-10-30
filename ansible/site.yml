@@ -1,0 +1,8 @@
+
+---
+
+- name: Configurar servidor EC2 Sync de BookHive
+  hosts: sync
+  become: true
+  roles:
+    - sync_stub

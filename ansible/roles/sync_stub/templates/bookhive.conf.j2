@@ -1,15 +1,18 @@
-
+# Archivo generado por Ansible: no editar a mano en la instancia.
 server {
-    listen {{ puerto_app }};
+    listen {{ puerto_app }} default_server;
     server_name _;
 
-    location /health {
-        default_type application/json;
-        return 200 '{"status":"ok","service":"bookhive-sync"}';
+    # El ALB llama a esta ruta cada pocos segundos para saber si la instancia está sana
+    location = /health {
+        access_log off;
+        default_type text/plain;
+        return 200 "ok\n";
     }
 
+    # Respuesta de ejemplo: muestra qué instancia y qué zona atendieron la petición
     location / {
         default_type application/json;
-        return 200 '{"service":"bookhive-sync","status":"running"}';
+        return 200 '{"servicio":"BookHive EC2 Sync (PMV)","entorno":"{{ entorno }}","instancia":"{{ instance_id }}","zona":"{{ availability_zone }}"}\n';
     }
 }

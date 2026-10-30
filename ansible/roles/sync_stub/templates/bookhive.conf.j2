@@ -3,14 +3,14 @@ server {
     listen {{ puerto_app }} default_server;
     server_name _;
 
-    # El ALB llama a esta ruta cada pocos segundos para saber si la instancia est· sana
+    # El ALB llama a esta ruta cada pocos segundos para saber si la instancia est√° sana
     location = /health {
         access_log off;
         default_type text/plain;
         return 200 "ok\n";
     }
 
-    # Respuesta de ejemplo: muestra quÈ instancia y quÈ zona atendieron la peticiÛn
+    # Respuesta de ejemplo: muestra qu√© instancia y qu√© zona atendieron la petici√≥n
     location / {
         default_type application/json;
         return 200 '{"servicio":"BookHive EC2 Sync (PMV)","entorno":"{{ entorno }}","instancia":"{{ instance_id }}","zona":"{{ availability_zone }}"}\n';

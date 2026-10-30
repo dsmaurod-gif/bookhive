@@ -1,8 +1,6 @@
 
 ---
-# Rol sync_stub: deja la instancia lista para recibir tráfico del ALB.
-# En el PMV el servidor de sala es nginx con un /health y una respuesta JSON.
-# La lógica real de WebSocket se instalará en esta misma estructura en una siguiente iteración.
+
 
 - name: Instalar nginx
   ansible.builtin.dnf:

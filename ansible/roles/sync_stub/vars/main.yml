@@ -1,5 +1,5 @@
 ---
-# Variables de configuración de BookHive Sync
+
 
 puerto_app: 8080
 paquete_web: nginx

@@ -3,7 +3,7 @@ locals {
   prefijo = "${var.proyecto}-${var.entorno}"
 }
 
-# User pool: directorio de lectores.
+
 resource "aws_cognito_user_pool" "lectores" {
   name = "${local.prefijo}-lectores"
 
@@ -20,7 +20,7 @@ resource "aws_cognito_user_pool" "lectores" {
   }
 }
 
-# Client: aplicación que inicia sesión.
+
 resource "aws_cognito_user_pool_client" "web" {
   name         = "${local.prefijo}-web"
   user_pool_id = aws_cognito_user_pool.lectores.id

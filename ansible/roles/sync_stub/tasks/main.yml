@@ -1,3 +1,55 @@
-#SPDX-License-Identifier: MIT-0
+
 ---
-# tasks file for sync_stub
+# Rol sync_stub: deja la instancia lista para recibir tráfico del ALB.
+# En el PMV el servidor de sala es nginx con un /health y una respuesta JSON.
+# La lógica real de WebSocket se instalará en esta misma estructura en una siguiente iteración.
+
+- name: Instalar nginx
+  ansible.builtin.dnf:
+    name: nginx
+    state: present
+
+- name: Crear la configuración del servidor de BookHive
+  ansible.builtin.template:
+    src: bookhive.conf.j2
+    dest: /etc/nginx/conf.d/bookhive.conf
+    owner: root
+    group: root
+    mode: "0644"
+  notify: Recargar nginx
+
+- name: Comprobar que la configuración de nginx es válida
+  ansible.builtin.command: nginx -t
+  changed_when: false
+
+- name: Habilitar e iniciar nginx
+  ansible.builtin.service:
+    name: nginx
+    state: started
+    enabled: true
+
+- name: Aplicar los cambios pendientes antes de verificar
+  ansible.builtin.meta: flush_handlers
+
+- name: Registrar una nota de prueba en DynamoDB (EC2 Sync -> DynamoDB por el VPC endpoint)
+  ansible.builtin.command:
+    argv:
+      - aws
+      - dynamodb
+      - put-item
+      - --table-name
+      - "{{ tabla_dynamodb }}"
+      - --region
+      - "{{ region }}"
+      - --item
+      - '{"PK":{"S":"SALA#demo"},"SK":{"S":"NOTA#{{ instance_id }}"},"texto":{"S":"Nota de prueba escrita desde {{ instance_id }}"},"zona":{"S":"{{ availability_zone }}"}}'
+  changed_when: false
+
+- name: Verificar que el servidor responde en /health
+  ansible.builtin.uri:
+    url: "http://localhost:{{ puerto_app }}/health"
+    status_code: 200
+  register: salud
+  retries: 5
+  delay: 3
+  until: salud.status == 200

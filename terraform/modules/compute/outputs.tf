@@ -1,24 +1,24 @@
 output "alb_dns_name" {
+  description = "Dirección DNS del ALB"
   value       = aws_lb.sync.dns_name
-  description = "Nombre DNS publico del Load Balancer"
 }
 
 output "alb_arn" {
+  description = "ARN del ALB"
   value       = aws_lb.sync.arn
-  description = "ARN del Load Balancer"
 }
 
 output "target_group_arn" {
+  description = "ARN del grupo de destino"
   value       = aws_lb_target_group.sync.arn
-  description = "ARN del Target Group"
 }
 
-output "asg_name" {
+output "asg_nombre" {
+  description = "Nombre del grupo de Auto Scaling"
   value       = aws_autoscaling_group.sync.name
-  description = "Nombre del Auto Scaling Group"
 }
 
-output "launch_template_id" {
-  value       = aws_launch_template.sync.id
-  description = "ID del Launch Template"
+output "bucket_ansible" {
+  description = "Bucket con los playbooks de Ansible"
+  value       = aws_s3_bucket.ansible.id
 }

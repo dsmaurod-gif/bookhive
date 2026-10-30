@@ -1,12 +1,27 @@
 #!/bin/bash
-set -e
+# user_data de EC2 Sync: instala Ansible y aplica el playbook descargado desde S3.
+# Huella de los playbooks (hace que Terraform cree una versión nueva si Ansible cambia): ${ansible_sha}
+set -euxo pipefail
+exec > >(tee /var/log/bookhive-bootstrap.log) 2>&1
 
-# Asignar variables desde Terraform
-BUCKET_ANSIBLE=""
-REGION=""
-TABLA=""
-ENTORNO=""
-PUERTO_APP=""
-ANSIBLE_SHA=""
+# 1. Instalar Ansible (los repositorios de Amazon Linux se descargan de S3 por el VPC endpoint)
+dnf install -y ansible-core
 
-echo "Iniciando configuracion de bootstrap..."
+# 2. Datos de la instancia (IMDSv2: primero se pide un token)
+TOKEN=$(curl -sS -X PUT "http://169.254.169.254/latest/api/token" -H "X-aws-ec2-metadata-token-ttl-seconds: 300")
+INSTANCE_ID=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/instance-id)
+AZ=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/latest/meta-data/placement/availability-zone)
+
+# 3. Descargar los playbooks desde el bucket privado
+mkdir -p /opt/bookhive/ansible
+aws s3 sync "s3:///ansible" /opt/bookhive/ansible --region 
+
+# 4. Ejecutar Ansible sobre esta misma instancia (conexión local)
+cd /opt/bookhive/ansible
+ansible-playbook site.yml \
+  -e "instance_id=$INSTANCE_ID" \
+  -e "availability_zone=$AZ" \
+  -e "tabla_dynamodb=" \
+  -e "region=" \
+  -e "entorno=" \
+  -e "puerto_app="

@@ -1,5 +1,5 @@
 output "alb_dns_name" {
-  description = "Dirección DNS del ALB"
+  description = "Direccion DNS del ALB"
   value       = aws_lb.sync.dns_name
 }
 

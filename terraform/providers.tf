@@ -17,11 +17,6 @@ terraform {
   }
 }
 
-variable "region" { default = "us-east-2" }
-variable "proyecto" { default = "bookhive" }
-variable "entorno" { default = "dev" }
-
-
 provider "aws" {
   region = var.region
 

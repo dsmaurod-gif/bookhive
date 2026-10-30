@@ -1,17 +1,17 @@
 locals {
   prefijo = "${var.proyecto}-${var.entorno}"
 
-  # Carpeta con los playbooks de Ansible (path.root = carpeta terraform/)
+
   ansible_dir      = "${path.root}/../ansible"
   archivos_ansible = fileset(local.ansible_dir, "**")
 
-  # Huella de todos los archivos de Ansible
+
   ansible_sha = sha1(join("", [for f in sort(tolist(local.archivos_ansible)) : filesha1("${local.ansible_dir}/${f}")]))
 }
 
 data "aws_caller_identity" "actual" {}
 
-# 1. Imagen (AMI) más reciente de Amazon Linux 2023
+
 data "aws_ami" "al2023" {
   most_recent = true
   owners      = ["amazon"]
@@ -27,7 +27,7 @@ data "aws_ami" "al2023" {
   }
 }
 
-# 2. Bucket privado con los playbooks de Ansible
+
 resource "aws_s3_bucket" "ansible" {
   bucket        = "${local.prefijo}-ansible-${data.aws_caller_identity.actual.account_id}"
   force_destroy = true
@@ -50,7 +50,7 @@ resource "aws_s3_object" "ansible" {
   etag   = filemd5("${local.ansible_dir}/${each.value}")
 }
 
-# 3. Rol IAM para las EC2 Sync
+
 data "aws_iam_policy_document" "ec2_confianza" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -101,7 +101,7 @@ resource "aws_iam_instance_profile" "sync" {
   role = aws_iam_role.sync.name
 }
 
-# 4. Launch Template con Ansible en user_data
+
 resource "aws_launch_template" "sync" {
   name_prefix   = "${local.prefijo}-sync-"
   image_id      = data.aws_ami.al2023.id
@@ -150,7 +150,7 @@ resource "aws_launch_template" "sync" {
   }
 }
 
-# 5. Application Load Balancer
+
 resource "aws_lb" "sync" {
   name                       = "${local.prefijo}-alb"
   load_balancer_type         = "application"
@@ -194,7 +194,7 @@ resource "aws_lb_listener" "http" {
   }
 }
 
-# 6. Auto Scaling Group
+
 resource "aws_autoscaling_group" "sync" {
   name                      = "${local.prefijo}-sync"
   min_size                  = var.asg_min
@@ -233,7 +233,7 @@ resource "aws_autoscaling_group" "sync" {
   }
 }
 
-# 7. Política de escalado por CPU (60 %)
+
 resource "aws_autoscaling_policy" "cpu" {
   name                   = "${local.prefijo}-sync-cpu"
   autoscaling_group_name = aws_autoscaling_group.sync.name

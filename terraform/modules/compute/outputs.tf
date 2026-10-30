@@ -1,25 +1,24 @@
-
 output "alb_dns_name" {
-  description = "DNS público del balanceador"
-  value       = aws_lb.principal.dns_name
+  value       = aws_lb.sync.dns_name
+  description = "Nombre DNS publico del Load Balancer"
 }
 
 output "alb_arn" {
-  description = "ARN del Application Load Balancer"
-  value       = aws_lb.principal.arn
+  value       = aws_lb.sync.arn
+  description = "ARN del Load Balancer"
 }
 
 output "target_group_arn" {
-  description = "ARN del grupo de destino"
-  value       = aws_lb_target_group.app.arn
+  value       = aws_lb_target_group.sync.arn
+  description = "ARN del Target Group"
 }
 
 output "asg_name" {
+  value       = aws_autoscaling_group.sync.name
   description = "Nombre del Auto Scaling Group"
-  value       = aws_autoscaling_group.app.name
 }
 
 output "launch_template_id" {
-  description = "Identificador del Launch Template"
-  value       = aws_launch_template.app.id
+  value       = aws_launch_template.sync.id
+  description = "ID del Launch Template"
 }

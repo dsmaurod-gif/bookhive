@@ -1,6 +1,6 @@
 #!/bin/bash
 # user_data de EC2 Sync: instala Ansible y aplica el playbook descargado desde S3.
-# Huella de los playbooks (hace que Terraform cree una versión nueva si Ansible cambia): ${ansible_sha}
+# Huella de los playbooks (hace que Terraform cree una version nueva si Ansible cambia): ${ansible_sha}
 set -euxo pipefail
 exec > >(tee /var/log/bookhive-bootstrap.log) 2>&1
 
@@ -14,14 +14,15 @@ AZ=$(curl -sS -H "X-aws-ec2-metadata-token: $TOKEN" http://169.254.169.254/lates
 
 # 3. Descargar los playbooks desde el bucket privado
 mkdir -p /opt/bookhive/ansible
-aws s3 sync "s3:///ansible" /opt/bookhive/ansible --region 
+aws s3 sync "s3://${bucket_ansible}/ansible" /opt/bookhive/ansible --region ${region}
 
-# 4. Ejecutar Ansible sobre esta misma instancia (conexión local)
+# 4. Ejecutar Ansible sobre esta misma instancia (conexion local)
 cd /opt/bookhive/ansible
 ansible-playbook site.yml \
   -e "instance_id=$INSTANCE_ID" \
   -e "availability_zone=$AZ" \
-  -e "tabla_dynamodb=" \
-  -e "region=" \
-  -e "entorno=" \
-  -e "puerto_app="
+  -e "tabla_dynamodb=${tabla}" \
+  -e "region=${region}" \
+  -e "entorno=${entorno}" \
+  -e "puerto_app=${puerto_app}"
+

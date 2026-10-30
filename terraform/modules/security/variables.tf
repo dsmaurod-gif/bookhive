@@ -21,5 +21,5 @@ variable "ip_permitida" {
 variable "puerto_app" {
   description = "Puerto en el que escucha EC2 Sync"
   type        = number
-  default     = 8080
+  default = 3000
 }

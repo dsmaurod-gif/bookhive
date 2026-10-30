@@ -1,7 +1,6 @@
 
 ---
-# Playbook principal: configura cada servidor EC2 Sync de BookHive.
-# Lo ejecuta la propia instancia al arrancar.
+
 - name: Configurar servidor EC2 Sync de BookHive
   hosts: sync
   become: true

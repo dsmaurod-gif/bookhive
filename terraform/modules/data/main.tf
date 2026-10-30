@@ -6,9 +6,9 @@ data "aws_caller_identity" "actual" {}
 
 resource "aws_dynamodb_table" "notas" {
   name         = "${local.prefijo}-notas"
-  billing_mode = "PAY_PER_REQUEST" 
-  hash_key     = "PK"              
-  range_key    = "SK"     
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "PK"
+  range_key    = "SK"
 
   attribute {
     name = "PK"
@@ -27,7 +27,7 @@ resource "aws_dynamodb_table" "notas" {
 
 resource "aws_s3_bucket" "app" {
   bucket        = "${local.prefijo}-app-${data.aws_caller_identity.actual.account_id}"
-  force_destroy = true 
+  force_destroy = true
 }
 
 resource "aws_s3_bucket_public_access_block" "app" {
@@ -98,7 +98,7 @@ resource "aws_rds_cluster" "aurora" {
   vpc_security_group_ids  = [var.sg_db_id]
   storage_encrypted       = true
   backup_retention_period = 1
-  skip_final_snapshot     = true 
+  skip_final_snapshot     = true
   deletion_protection     = false
   apply_immediately       = true
 

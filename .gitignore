@@ -1,0 +1,41 @@
+# Directorios locales de Terraform
+.terraform/
+
+# Estado de Terraform (vive en S3, nunca en Git)
+*.tfstate
+*.tfstate.*
+
+# Registros de fallos
+crash.log
+crash.*.log
+
+# Variables locales (pueden contener correos u otros datos propios)
+*.tfvars
+*.tfvars.json
+
+# Archivos override
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Configuración CLI y archivos de bloqueo temporal
+.terraformrc
+terraform.rc
+.terraform.tfstate.lock.info
+
+# Plan guardado
+tfplan
+
+# Configuración del backend con el nombre real del bucket (FLOW.md lo exige)
+terraform/backend.hcl
+
+# Paquetes generados de las Lambda
+*.zip
+
+# Python
+__pycache__/
+*.pyc
+
+# Ansible
+*.retry

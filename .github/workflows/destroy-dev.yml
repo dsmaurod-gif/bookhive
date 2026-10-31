@@ -1,0 +1,69 @@
+name: Destruir BookHive (dev)
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmar:
+        description: 'Escribe destruir para confirmar'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: despliegue-dev
+  cancel-in-progress: false
+
+jobs:
+  destruir:
+    name: Terraform destroy (dev)
+    if: ${{ inputs.confirmar == 'destruir' }}
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_VAR_region: ${{ vars.AWS_REGION }}
+      TF_VAR_correo_demo: ${{ secrets.TF_VAR_CORREO_DEMO }}
+      TF_VAR_asg_min: "1"
+      TF_VAR_asg_max: "1"
+      TF_VAR_asg_deseado: "1"
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Preparar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      - name: Autenticarse en AWS con OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+          role-duration-seconds: 7200
+
+      - name: Verificar la identidad en AWS
+        run: aws sts get-caller-identity
+
+      - name: Terraform init
+        run: >
+          terraform init -input=false
+          -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+          -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: Recursos que se destruiran
+        run: terraform state list
+
+      - name: Terraform destroy
+        run: terraform destroy -input=false -auto-approve
+
+      - name: Verificar que el estado quedo vacio
+        run: |
+          echo "Recursos restantes en el estado:"
+          terraform state list | wc -l

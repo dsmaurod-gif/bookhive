@@ -55,3 +55,31 @@ module "compute" {
   asg_max             = var.asg_max
   asg_deseado         = var.asg_deseado
 }
+
+module "messaging" {
+  source = "./modules/messaging"
+
+  proyecto    = var.proyecto
+  entorno     = var.entorno
+  correo_demo = var.correo_demo
+}
+
+module "api" {
+  source = "./modules/api"
+
+  proyecto            = var.proyecto
+  entorno             = var.entorno
+  subredes_aplicacion = module.network.subredes_aplicacion_ids
+  sg_lambda_id        = module.security.sg_lambda_id
+  user_pool_arn       = module.auth.user_pool_arn
+  sns_topic_arn       = module.messaging.sns_topic_arn
+  secreto_arn         = module.data.secreto_arn
+}
+
+module "backup" {
+  source = "./modules/backup"
+
+  proyecto     = var.proyecto
+  entorno      = var.entorno
+  recursos_arn = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+}

@@ -31,16 +31,11 @@
 
 - name: Registrar una nota de prueba en DynamoDB (EC2 Sync -> DynamoDB por el VPC endpoint)
   ansible.builtin.command:
-    argv:
-      - aws
-      - dynamodb
-      - put-item
-      - --table-name
-      - "{{ tabla_dynamodb }}"
-      - --region
-      - "{{ region }}"
-      - --item
-      - '{"PK":{"S":"SALA#demo"},"SK":{"S":"NOTA#{{ instance_id }}"},"texto":{"S":"Nota de prueba escrita desde {{ instance_id }}"},"zona":{"S":"{{ availability_zone }}"}}'
+    cmd: >-
+      aws dynamodb put-item
+      --table-name {{ tabla_dynamodb }}
+      --region {{ region }}
+      --item '{"PK":{"S":"SALA#demo"},"SK":{"S":"NOTA#{{ instance_id }}"},"texto":{"S":"Nota de prueba escrita desde {{ instance_id }}"},"zona":{"S":"{{ availability_zone }}"}}'
   changed_when: false
 
 - name: Verificar que el servidor responde en /health

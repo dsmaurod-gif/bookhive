@@ -27,7 +27,7 @@ terraform.rc
 # Plan guardado
 tfplan
 
-# Configuración del backend con el nombre real del bucket (FLOW.md lo exige)
+# Configuración del backend con el nombre real del bucket (no se versiona)
 terraform/backend.hcl
 
 # Paquetes generados de las Lambda

@@ -1,0 +1,70 @@
+name: Desplegar BookHive (dev)
+
+run-name: ${{ github.actor }} despliega BookHive en dev (${{ github.sha }})
+
+on:
+  push:
+    branches:
+      - development
+
+permissions:
+  contents: read
+  id-token: write
+
+concurrency:
+  group: despliegue-dev
+  cancel-in-progress: false
+
+jobs:
+  desplegar:
+    name: Terraform plan y apply (dev)
+    runs-on: ubuntu-latest
+    environment: dev
+    env:
+      TF_VAR_region: ${{ vars.AWS_REGION }}
+      TF_VAR_correo_demo: ${{ secrets.TF_VAR_CORREO_DEMO }}
+      TF_VAR_asg_min: "1"
+      TF_VAR_asg_max: "1"
+      TF_VAR_asg_deseado: "1"
+    defaults:
+      run:
+        working-directory: terraform
+    steps:
+      - name: Descargar el codigo
+        uses: actions/checkout@v4
+
+      - name: Preparar Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.10.5
+          terraform_wrapper: false
+
+      - name: Autenticarse en AWS con OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ vars.AWS_ROLE_ARN }}
+          aws-region: ${{ vars.AWS_REGION }}
+
+      - name: Verificar la identidad en AWS
+        run: aws sts get-caller-identity
+
+      - name: Terraform init
+        run: >-
+          terraform init -input=false
+          -backend-config="bucket=${{ vars.TF_STATE_BUCKET }}"
+          -backend-config="region=${{ vars.AWS_REGION }}"
+
+      - name: Terraform fmt
+        run: terraform fmt -check -recursive
+
+      - name: Terraform validate
+        run: terraform validate
+
+      - name: Terraform plan
+        run: terraform plan -input=false -out=tfplan
+
+      - name: Terraform apply
+        run: terraform apply -input=false tfplan
+
+      - name: Mostrar las salidas
+        run: terraform output

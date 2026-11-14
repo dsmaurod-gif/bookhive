@@ -11,7 +11,7 @@ data "archive_file" "api_clubes" {
 
 resource "aws_cloudwatch_log_group" "api_clubes" {
   name              = "/aws/lambda/${local.prefijo}-api-clubes"
-  retention_in_days = 30 # RNF-29
+  retention_in_days = 365 # RNF-29
 }
 
 data "aws_iam_policy_document" "lambda_confianza" {
@@ -179,6 +179,7 @@ resource "aws_api_gateway_stage" "api" {
   rest_api_id   = aws_api_gateway_rest_api.api.id
   deployment_id = aws_api_gateway_deployment.api.id
   stage_name    = var.entorno
+  xray_tracing_enabled = true
 }
 
 # Throttling: límite de peticiones. Al superarlo responde 429 (RNF-08 y RNF-21)

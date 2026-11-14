@@ -30,6 +30,13 @@ resource "aws_s3_bucket" "app" {
   force_destroy = true
 }
 
+resource "aws_s3_bucket_versioning" "app" {
+  bucket = aws_s3_bucket.app.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
 resource "aws_s3_bucket_public_access_block" "app" {
   bucket                  = aws_s3_bucket.app.id
   block_public_acls       = true
@@ -161,4 +168,59 @@ resource "aws_elasticache_replication_group" "cache" {
   at_rest_encryption_enabled  = true
   transit_encryption_enabled  = true
   apply_immediately           = true
+}
+
+resource "aws_s3_bucket" "logs" {
+  bucket        = "${local.prefijo}-logs-${data.aws_caller_identity.actual.account_id}"
+  force_destroy = true
+}
+
+resource "aws_s3_bucket_public_access_block" "logs" {
+  bucket                  = aws_s3_bucket.logs.id
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
+  restrict_public_buckets = true
+}
+
+resource "aws_s3_bucket_versioning" "logs" {
+  bucket = aws_s3_bucket.logs.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_server_side_encryption_configuration" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  rule {
+    apply_server_side_encryption_by_default {
+      sse_algorithm = "AES256"
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "logs" {
+  bucket = aws_s3_bucket.logs.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "S3ServerAccessLogsPolicy"
+      Effect    = "Allow"
+      Principal = { Service = "logging.s3.amazonaws.com" }
+      Action    = ["s3:PutObject"]
+      Resource  = "${aws_s3_bucket.logs.arn}/app/*"
+      Condition = {
+        ArnLike      = { "aws:SourceArn" = aws_s3_bucket.app.arn }
+        StringEquals = { "aws:SourceAccount" = data.aws_caller_identity.actual.account_id }
+      }
+    }]
+  })
+}
+
+resource "aws_s3_bucket_logging" "app" {
+  bucket        = aws_s3_bucket.app.id
+  target_bucket = aws_s3_bucket.logs.id
+  target_prefix = "app/"
 }

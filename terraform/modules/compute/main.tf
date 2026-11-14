@@ -32,6 +32,34 @@ resource "aws_s3_bucket" "ansible" {
   bucket        = "${local.prefijo}-ansible-${data.aws_caller_identity.actual.account_id}"
   force_destroy = true
 }
+# Arreglo del bucket 
+resource "aws_s3_bucket_versioning" "ansible" {
+  bucket = aws_s3_bucket.ansible.id
+  versioning_configuration {
+    status = "Enabled"
+  }
+}
+
+resource "aws_s3_bucket_lifecycle_configuration" "ansible" {
+  bucket = aws_s3_bucket.ansible.id
+
+  rule {
+    id     = "limpieza-versiones-y-multipart"
+    status = "Enabled"
+
+    filter {}
+
+    abort_incomplete_multipart_upload {
+      days_after_initiation = 7
+    }
+
+    noncurrent_version_expiration {
+      noncurrent_days = 30
+    }
+  }
+
+  depends_on = [aws_s3_bucket_versioning.ansible]
+}
 
 resource "aws_s3_bucket_public_access_block" "ansible" {
   bucket                  = aws_s3_bucket.ansible.id

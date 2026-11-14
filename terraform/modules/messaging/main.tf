@@ -6,7 +6,8 @@ locals {
 #    El "suscriptor futuro" del diagrama (ej. notificaciones push) se agregaría con otro
 #    aws_sns_topic_subscription, sin tocar la Lambda que publica.
 resource "aws_sns_topic" "eventos_club" {
-  name = "${local.prefijo}-eventos-club"
+  name              = "${local.prefijo}-eventos-club"
+  kms_master_key_id = "alias/aws/sns"
 }
 
 # 2. SQS: cola de correos y su cola de mensajes fallidos (DLQ)
@@ -110,7 +111,7 @@ resource "aws_iam_role_policy" "notificador_ses" {
       {
         Effect   = "Allow"
         Action   = ["ses:SendEmail"]
-        Resource = "*"
+        Resource = aws_sesv2_email_identity.demo.arn
       }
     ]
   })

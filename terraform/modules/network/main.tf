@@ -152,3 +152,41 @@ resource "aws_vpc_endpoint" "interface" {
     Name = "${local.prefijo}-vpce-${each.key}"
   }
 }
+
+resource "aws_cloudwatch_log_group" "flow_logs" {
+  name              = "/bookhive/vpc-flow-logs"
+  retention_in_days = 365
+}
+
+resource "aws_iam_role" "flow_logs" {
+  name = "bookhive-flow-logs"
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect    = "Allow"
+      Principal = { Service = "vpc-flow-logs.amazonaws.com" }
+      Action    = "sts:AssumeRole"
+    }]
+  })
+}
+
+resource "aws_iam_role_policy" "flow_logs" {
+  name = "bookhive-flow-logs"
+  role = aws_iam_role.flow_logs.id
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"]
+      Resource = "${aws_cloudwatch_log_group.flow_logs.arn}:*"
+    }]
+  })
+}
+
+resource "aws_flow_log" "principal" {
+  vpc_id               = aws_vpc.principal.id
+  traffic_type         = "ALL"
+  log_destination_type = "cloud-watch-logs"
+  log_destination      = aws_cloudwatch_log_group.flow_logs.arn
+  iam_role_arn         = aws_iam_role.flow_logs.arn
+}

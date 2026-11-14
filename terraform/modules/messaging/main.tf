@@ -110,7 +110,7 @@ resource "aws_iam_role_policy" "notificador_ses" {
       {
         Effect   = "Allow"
         Action   = ["ses:SendEmail"]
-        Resource = "*"
+        Resource = aws_sesv2_email_identity.demo.arn
       }
     ]
   })

@@ -28,9 +28,11 @@ data "aws_ami" "al2023" {
 }
 
 
-resource "aws_s3_bucket" "ansible" {
-  bucket        = "${local.prefijo}-ansible-${data.aws_caller_identity.actual.account_id}"
-  force_destroy = true
+resource "aws_s3_bucket_versioning" "ansible" {
+  bucket = aws_s3_bucket.ansible.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "ansible" {

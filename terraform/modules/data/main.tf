@@ -25,10 +25,13 @@ resource "aws_dynamodb_table" "notas" {
   }
 }
 
-resource "aws_s3_bucket" "app" {
-  bucket        = "${local.prefijo}-app-${data.aws_caller_identity.actual.account_id}"
-  force_destroy = true
+resource "aws_s3_bucket_versioning" "app" {
+  bucket = aws_s3_bucket.app.id
+  versioning_configuration {
+    status = "Enabled"
+  }
 }
+
 
 resource "aws_s3_bucket_public_access_block" "app" {
   bucket                  = aws_s3_bucket.app.id

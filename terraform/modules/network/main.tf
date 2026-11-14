@@ -12,6 +12,11 @@ resource "aws_vpc" "principal" {
   }
 }
 
+resource "aws_default_security_group" "default" {
+  vpc_id = aws_vpc.principal.id
+  # Sin bloques ingress ni egress: bloquea todo el tráfico.
+}
+
 resource "aws_internet_gateway" "principal" {
   vpc_id = aws_vpc.principal.id
 

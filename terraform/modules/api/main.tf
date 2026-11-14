@@ -11,7 +11,7 @@ data "archive_file" "api_clubes" {
 
 resource "aws_cloudwatch_log_group" "api_clubes" {
   name              = "/aws/lambda/${local.prefijo}-api-clubes"
-  retention_in_days = 30 # RNF-29
+  retention_in_days = 365 # RNF-29
 }
 
 data "aws_iam_policy_document" "lambda_confianza" {

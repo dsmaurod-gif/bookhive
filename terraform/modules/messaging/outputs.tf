@@ -17,3 +17,18 @@ output "dlq_arn" {
   description = "ARN de la cola de mensajes fallidos"
   value       = aws_sqs_queue.dlq.arn
 }
+
+output "sns_alertas_arn" {
+  description = "ARN del tema SNS de alertas (destino de las alarmas de CloudWatch)"
+  value       = aws_sns_topic.alertas.arn
+}
+
+output "notificador_nombre" {
+  description = "Nombre de la Lambda notificador"
+  value       = aws_lambda_function.notificador.function_name
+}
+
+output "dlq_nombre" {
+  description = "Nombre de la cola de mensajes fallidos"
+  value       = aws_sqs_queue.dlq.name
+}

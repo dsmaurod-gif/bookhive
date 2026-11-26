@@ -59,9 +59,10 @@ module "compute" {
 module "messaging" {
   source = "./modules/messaging"
 
-  proyecto    = var.proyecto
-  entorno     = var.entorno
-  correo_demo = var.correo_demo
+  proyecto       = var.proyecto
+  entorno        = var.entorno
+  correo_demo    = var.correo_demo
+  correo_alertas = var.correo_demo
 }
 
 module "api" {

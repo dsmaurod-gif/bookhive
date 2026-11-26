@@ -59,9 +59,10 @@ module "compute" {
 module "messaging" {
   source = "./modules/messaging"
 
-  proyecto    = var.proyecto
-  entorno     = var.entorno
-  correo_demo = var.correo_demo
+  proyecto       = var.proyecto
+  entorno        = var.entorno
+  correo_demo    = var.correo_demo
+  correo_alertas = var.correo_demo
 }
 
 module "api" {
@@ -82,4 +83,22 @@ module "backup" {
   proyecto     = var.proyecto
   entorno      = var.entorno
   recursos_arn = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+}
+
+module "observability" {
+  source = "./modules/observability"
+
+  proyecto                  = var.proyecto
+  entorno                   = var.entorno
+  region                    = var.region
+  sns_alertas_arn           = module.messaging.sns_alertas_arn
+  alb_arn_suffix            = module.compute.alb_arn_suffix
+  target_group_arn_suffix   = module.compute.target_group_arn_suffix
+  asg_nombre                = module.compute.asg_nombre
+  api_nombre                = module.api.api_nombre
+  api_stage                 = module.api.stage_nombre
+  lambda_api_nombre         = module.api.lambda_nombre
+  lambda_notificador_nombre = module.messaging.notificador_nombre
+  tabla_notas_nombre        = module.data.tabla_notas_nombre
+  dlq_nombre                = module.messaging.dlq_nombre
 }

@@ -37,3 +37,13 @@ output "bucket_ansible" {
   description = "Bucket S3 con los archivos de Ansible"
   value       = module.compute.bucket_ansible
 }
+
+output "sns_alertas_arn" {
+  description = "ARN del tema SNS de alertas (destino de las alarmas de CloudWatch)"
+  value       = module.messaging.sns_alertas_arn
+}
+
+output "panel_nombre" {
+  description = "Nombre del panel de CloudWatch"
+  value       = module.observability.panel_nombre
+}

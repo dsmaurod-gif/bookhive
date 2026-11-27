@@ -6,3 +6,4 @@
   become: true
   roles:
     - sync_stub
+    - red_websocket

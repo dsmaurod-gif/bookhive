@@ -80,9 +80,10 @@ module "api" {
 module "backup" {
   source = "./modules/backup"
 
-  proyecto     = var.proyecto
-  entorno      = var.entorno
-  recursos_arn = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+  proyecto        = var.proyecto
+  entorno         = var.entorno
+  recursos_arn    = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+  acciones_alarma = [module.messaging.sns_alertas_arn]
 }
 
 module "observability" {

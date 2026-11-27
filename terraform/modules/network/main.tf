@@ -154,8 +154,9 @@ resource "aws_vpc_endpoint" "interface" {
 }
 
 resource "aws_cloudwatch_log_group" "flow_logs" {
+  # checkov:skip=CKV_AWS_338: RNF-29 fija 30 dias de retencion de logs y conservar 1 año encarece el almacenamiento sin ser exigido en el PMV
   name              = "/bookhive/vpc-flow-logs"
-  retention_in_days = 365
+  retention_in_days = 30 # RNF-29
 }
 
 resource "aws_iam_role" "flow_logs" {

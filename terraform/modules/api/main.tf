@@ -10,8 +10,9 @@ data "archive_file" "api_clubes" {
 }
 
 resource "aws_cloudwatch_log_group" "api_clubes" {
+  # checkov:skip=CKV_AWS_338: RNF-29 fija 30 dias de retencion de logs y conservar 1 año encarece el almacenamiento sin ser exigido en el PMV
   name              = "/aws/lambda/${local.prefijo}-api-clubes"
-  retention_in_days = 365 # RNF-29
+  retention_in_days = 30 # RNF-29
 }
 
 data "aws_iam_policy_document" "lambda_confianza" {

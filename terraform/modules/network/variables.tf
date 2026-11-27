@@ -22,3 +22,9 @@ variable "zonas" {
   description = "Zonas de disponibilidad: [AZ A, AZ B]"
   type        = list(string)
 }
+
+variable "habilitar_endpoints_monitoreo" {
+  description = "Crea los endpoints de CloudWatch (logs y monitoring) para que el agente de las EC2 envíe métricas y logs sin salir a internet. Cada endpoint de interfaz cobra por hora y por zona"
+  type        = bool
+  default     = true
+}

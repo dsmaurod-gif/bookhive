@@ -139,7 +139,7 @@ resource "aws_vpc_endpoint" "gateway" {
 }
 
 resource "aws_vpc_endpoint" "interface" {
-  for_each = toset(["sns", "secretsmanager"])
+  for_each = toset(concat(["sns", "secretsmanager"], var.habilitar_endpoints_monitoreo ? ["logs", "monitoring"] : []))
 
   vpc_id              = aws_vpc.principal.id
   service_name        = "com.amazonaws.${var.region}.${each.key}"

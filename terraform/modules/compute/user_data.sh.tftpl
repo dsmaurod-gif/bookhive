@@ -24,5 +24,7 @@ ansible-playbook site.yml \
   -e "tabla_dynamodb=${tabla}" \
   -e "region=${region}" \
   -e "entorno=${entorno}" \
-  -e "puerto_app=${puerto_app}"
+  -e "puerto_app=${puerto_app}" \
+  -e "habilitar_agente_cw=${habilitar_agente}" \
+  -e "grupo_logs=${grupo_logs}"
 

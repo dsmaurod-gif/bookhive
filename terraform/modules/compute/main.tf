@@ -119,6 +119,29 @@ resource "aws_iam_role_policy" "sync" {
         Effect   = "Allow"
         Action   = ["dynamodb:PutItem"]
         Resource = var.tabla_notas_arn
+      },
+      {
+        Sid      = "MetricasDelAgente"
+        Effect   = "Allow"
+        Action   = ["cloudwatch:PutMetricData"]
+        Resource = "*"
+        Condition = {
+          StringEquals = {
+            "cloudwatch:namespace" = "BookHive/EC2"
+          }
+        }
+      },
+      {
+        Sid      = "LogsDelAgente"
+        Effect   = "Allow"
+        Action   = ["logs:CreateLogStream", "logs:PutLogEvents", "logs:DescribeLogStreams"]
+        Resource = "${aws_cloudwatch_log_group.sync.arn}:*"
+      },
+      {
+        Sid      = "ListarGruposDeLogs"
+        Effect   = "Allow"
+        Action   = ["logs:DescribeLogGroups"]
+        Resource = "*"
       }
     ]
   })
@@ -127,6 +150,12 @@ resource "aws_iam_role_policy" "sync" {
 resource "aws_iam_instance_profile" "sync" {
   name = "${local.prefijo}-sync-profile"
   role = aws_iam_role.sync.name
+}
+
+resource "aws_cloudwatch_log_group" "sync" {
+  # checkov:skip=CKV_AWS_338: RNF-29 fija 30 dias de retencion de logs y conservar 1 año encarece el almacenamiento sin ser exigido en el PMV
+  name              = "/bookhive/ec2-sync"
+  retention_in_days = 30 # RNF-29
 }
 
 
@@ -159,12 +188,14 @@ resource "aws_launch_template" "sync" {
   }
 
   user_data = base64encode(templatefile("${path.module}/user_data.sh.tftpl", {
-    bucket_ansible = aws_s3_bucket.ansible.id
-    region         = var.region
-    tabla          = var.tabla_notas_nombre
-    entorno        = var.entorno
-    puerto_app     = var.puerto_app
-    ansible_sha    = local.ansible_sha
+    bucket_ansible   = aws_s3_bucket.ansible.id
+    region           = var.region
+    tabla            = var.tabla_notas_nombre
+    entorno          = var.entorno
+    puerto_app       = var.puerto_app
+    ansible_sha      = local.ansible_sha
+    habilitar_agente = var.habilitar_agente_cloudwatch
+    grupo_logs       = aws_cloudwatch_log_group.sync.name
   }))
 
   update_default_version = true

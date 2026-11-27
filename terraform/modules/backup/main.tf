@@ -53,17 +53,22 @@ resource "aws_backup_selection" "recursos" {
   resources    = var.recursos_arn
 }
 
-# 5. Alarma: avisa si falla un respaldo (CloudWatch).
-#    Verificar en la consola (CloudWatch > Métricas > AWS/Backup) las dimensiones disponibles.
+# 5. Alarma: avisa si falla un respaldo (RNF-17: aviso en menos de 15 minutos).
+#    AWS Backup publica sus métricas con dimensiones (tipo de recurso, bóveda). La alarma anterior no tenía
+#    dimensiones y probablemente no veía ningún dato. Dimensión usada aquí: ResourceType = DynamoDB.
+#    Se debe verificar con "aws cloudwatch list-metrics --namespace AWS/Backup" después de un respaldo.
 resource "aws_cloudwatch_metric_alarm" "respaldo_fallido" {
   alarm_name          = "${local.prefijo}-respaldo-fallido"
   alarm_description   = "Un respaldo de AWS Backup falló"
   namespace           = "AWS/Backup"
   metric_name         = "NumberOfBackupJobsFailed"
+  dimensions          = { ResourceType = "DynamoDB" }
   statistic           = "Sum"
-  period              = 3600
+  period              = 900
   evaluation_periods  = 1
   threshold           = 0
   comparison_operator = "GreaterThanThreshold"
   treat_missing_data  = "notBreaching"
+  alarm_actions       = var.acciones_alarma
+  ok_actions          = var.acciones_alarma
 }

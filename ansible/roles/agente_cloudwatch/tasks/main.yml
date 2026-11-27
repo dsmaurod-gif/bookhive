@@ -1,0 +1,29 @@
+---
+# Instala el agente de CloudWatch y le entrega su configuración.
+# El paquete sale del repositorio de Amazon Linux 2023, que se descarga por el endpoint de S3 (sin internet).
+
+- name: Instalar el agente de CloudWatch
+  ansible.builtin.dnf:
+    name: amazon-cloudwatch-agent
+    state: present
+
+- name: Copiar la configuración del agente
+  ansible.builtin.template:
+    src: amazon-cloudwatch-agent.json.j2
+    dest: /opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+    owner: root
+    group: root
+    mode: "0644"
+
+- name: Cargar la configuración e iniciar el agente
+  ansible.builtin.command:
+    cmd: >-
+      /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl
+      -a fetch-config -m ec2 -s
+      -c file:/opt/aws/amazon-cloudwatch-agent/etc/amazon-cloudwatch-agent.json
+  changed_when: true
+
+- name: Habilitar el agente al arrancar la instancia
+  ansible.builtin.service:
+    name: amazon-cloudwatch-agent
+    enabled: true

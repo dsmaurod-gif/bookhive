@@ -7,3 +7,5 @@
   roles:
     - sync_stub
     - red_websocket
+    - role: agente_cloudwatch
+      when: habilitar_agente_cw | default(false) | bool

@@ -139,7 +139,7 @@ resource "aws_vpc_endpoint" "gateway" {
 }
 
 resource "aws_vpc_endpoint" "interface" {
-  for_each = toset(["sns", "secretsmanager"])
+  for_each = toset(concat(["sns", "secretsmanager"], var.habilitar_endpoints_monitoreo ? ["logs", "monitoring"] : []))
 
   vpc_id              = aws_vpc.principal.id
   service_name        = "com.amazonaws.${var.region}.${each.key}"
@@ -154,8 +154,9 @@ resource "aws_vpc_endpoint" "interface" {
 }
 
 resource "aws_cloudwatch_log_group" "flow_logs" {
+  # checkov:skip=CKV_AWS_338: RNF-29 fija 30 dias de retencion de logs y conservar 1 año encarece el almacenamiento sin ser exigido en el PMV
   name              = "/bookhive/vpc-flow-logs"
-  retention_in_days = 365
+  retention_in_days = 30 # RNF-29
 }
 
 resource "aws_iam_role" "flow_logs" {

@@ -47,3 +47,8 @@ output "panel_nombre" {
   description = "Nombre del panel de CloudWatch"
   value       = module.observability.panel_nombre
 }
+
+output "cloudfront_dominio" {
+  description = "Dominio de CloudFront: la entrada pública de BookHive"
+  value       = module.edge.cloudfront_dominio
+}

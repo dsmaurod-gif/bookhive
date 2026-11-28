@@ -1,0 +1,20 @@
+---
+# Ajustes de red del kernel para conexiones WebSocket de larga duración.
+# Usa un módulo de la colección ansible.posix, instalada desde Ansible Galaxy.
+#
+# Por defecto Linux espera 2 horas antes de comprobar si el otro extremo de una conexión sigue vivo.
+# Con keepalive de 5 minutos, una conexión de lector que se cortó (celular sin señal, por ejemplo)
+# se detecta pronto y libera recursos de la sala.
+
+- name: Ajustar el keepalive de TCP para conexiones WebSocket
+  ansible.posix.sysctl:
+    name: "{{ item.nombre }}"
+    value: "{{ item.valor }}"
+    sysctl_file: /etc/sysctl.d/99-bookhive.conf
+    sysctl_set: true
+    state: present
+    reload: true
+  loop:
+    - { nombre: net.ipv4.tcp_keepalive_time, valor: "300" }
+    - { nombre: net.ipv4.tcp_keepalive_intvl, valor: "30" }
+    - { nombre: net.ipv4.tcp_keepalive_probes, valor: "5" }

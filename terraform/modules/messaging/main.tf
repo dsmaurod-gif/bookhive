@@ -75,6 +75,7 @@ data "archive_file" "notificador" {
 }
 
 resource "aws_cloudwatch_log_group" "notificador" {
+  # checkov:skip=CKV_AWS_338: RNF-29 fija 30 dias de retencion de logs y conservar 1 año encarece el almacenamiento sin ser exigido en el PMV
   name              = "/aws/lambda/${local.prefijo}-notificador"
   retention_in_days = 30 # RNF-29
 }

@@ -1,11 +1,12 @@
 module "network" {
   source = "./modules/network"
 
-  proyecto = var.proyecto
-  entorno  = var.entorno
-  region   = var.region
-  vpc_cidr = var.vpc_cidr
-  zonas    = var.zonas
+  proyecto                      = var.proyecto
+  entorno                       = var.entorno
+  region                        = var.region
+  vpc_cidr                      = var.vpc_cidr
+  zonas                         = var.zonas
+  habilitar_endpoints_monitoreo = var.habilitar_agente_cloudwatch
 }
 
 module "security" {
@@ -40,20 +41,21 @@ module "auth" {
 module "compute" {
   source = "./modules/compute"
 
-  proyecto            = var.proyecto
-  entorno             = var.entorno
-  region              = var.region
-  subredes_publicas   = module.network.subredes_publicas_ids
-  subredes_aplicacion = module.network.subredes_aplicacion_ids
-  vpc_id              = module.network.vpc_id
-  sg_alb_id           = module.security.sg_alb_id
-  sg_app_id           = module.security.sg_app_id
-  tabla_notas_nombre  = module.data.tabla_notas_nombre
-  tabla_notas_arn     = module.data.tabla_notas_arn
-  instance_type       = var.instance_type
-  asg_min             = var.asg_min
-  asg_max             = var.asg_max
-  asg_deseado         = var.asg_deseado
+  proyecto                    = var.proyecto
+  entorno                     = var.entorno
+  region                      = var.region
+  subredes_publicas           = module.network.subredes_publicas_ids
+  subredes_aplicacion         = module.network.subredes_aplicacion_ids
+  vpc_id                      = module.network.vpc_id
+  sg_alb_id                   = module.security.sg_alb_id
+  sg_app_id                   = module.security.sg_app_id
+  tabla_notas_nombre          = module.data.tabla_notas_nombre
+  tabla_notas_arn             = module.data.tabla_notas_arn
+  instance_type               = var.instance_type
+  asg_min                     = var.asg_min
+  asg_max                     = var.asg_max
+  asg_deseado                 = var.asg_deseado
+  habilitar_agente_cloudwatch = var.habilitar_agente_cloudwatch
 }
 
 module "messaging" {
@@ -80,9 +82,10 @@ module "api" {
 module "backup" {
   source = "./modules/backup"
 
-  proyecto     = var.proyecto
-  entorno      = var.entorno
-  recursos_arn = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+  proyecto        = var.proyecto
+  entorno         = var.entorno
+  recursos_arn    = compact([module.data.tabla_notas_arn, module.data.aurora_arn])
+  acciones_alarma = [module.messaging.sns_alertas_arn]
 }
 
 module "observability" {
@@ -101,4 +104,19 @@ module "observability" {
   lambda_notificador_nombre = module.messaging.notificador_nombre
   tabla_notas_nombre        = module.data.tabla_notas_nombre
   dlq_nombre                = module.messaging.dlq_nombre
+}
+
+module "edge" {
+  source = "./modules/edge"
+
+  providers = {
+    aws.virginia = aws.virginia
+  }
+
+  proyecto     = var.proyecto
+  entorno      = var.entorno
+  region       = var.region
+  bucket_app   = module.data.bucket_app
+  api_url      = module.api.api_url
+  alb_dns_name = module.compute.alb_dns_name
 }

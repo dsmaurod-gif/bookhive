@@ -33,6 +33,13 @@ jobs:
       - name: Descargar el codigo
         uses: actions/checkout@v4
 
+      - name: Descargar las colecciones de Ansible Galaxy
+        working-directory: ${{ github.workspace }}
+        run: |
+          python3 -m venv /tmp/venv-ansible
+          /tmp/venv-ansible/bin/pip install --quiet ansible-core
+          /tmp/venv-ansible/bin/ansible-galaxy collection install -r ansible/requirements.yml -p ansible/collections
+
       - name: Preparar Terraform
         uses: hashicorp/setup-terraform@v3
         with:

@@ -1,0 +1,7 @@
+---
+# Colecciones de Ansible Galaxy que usa el playbook.
+# Las EC2 están en subredes privadas SIN internet, así que NO descargan nada de Galaxy:
+# el pipeline de GitHub Actions las descarga y las sube al bucket S3 junto con los playbooks.
+collections:
+  - name: ansible.posix
+    version: "1.5.4"

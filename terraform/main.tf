@@ -1,11 +1,12 @@
 module "network" {
   source = "./modules/network"
 
-  proyecto = var.proyecto
-  entorno  = var.entorno
-  region   = var.region
-  vpc_cidr = var.vpc_cidr
-  zonas    = var.zonas
+  proyecto                      = var.proyecto
+  entorno                       = var.entorno
+  region                        = var.region
+  vpc_cidr                      = var.vpc_cidr
+  zonas                         = var.zonas
+  habilitar_endpoints_monitoreo = var.habilitar_agente_cloudwatch
 }
 
 module "security" {
@@ -40,20 +41,21 @@ module "auth" {
 module "compute" {
   source = "./modules/compute"
 
-  proyecto            = var.proyecto
-  entorno             = var.entorno
-  region              = var.region
-  subredes_publicas   = module.network.subredes_publicas_ids
-  subredes_aplicacion = module.network.subredes_aplicacion_ids
-  vpc_id              = module.network.vpc_id
-  sg_alb_id           = module.security.sg_alb_id
-  sg_app_id           = module.security.sg_app_id
-  tabla_notas_nombre  = module.data.tabla_notas_nombre
-  tabla_notas_arn     = module.data.tabla_notas_arn
-  instance_type       = var.instance_type
-  asg_min             = var.asg_min
-  asg_max             = var.asg_max
-  asg_deseado         = var.asg_deseado
+  proyecto                    = var.proyecto
+  entorno                     = var.entorno
+  region                      = var.region
+  subredes_publicas           = module.network.subredes_publicas_ids
+  subredes_aplicacion         = module.network.subredes_aplicacion_ids
+  vpc_id                      = module.network.vpc_id
+  sg_alb_id                   = module.security.sg_alb_id
+  sg_app_id                   = module.security.sg_app_id
+  tabla_notas_nombre          = module.data.tabla_notas_nombre
+  tabla_notas_arn             = module.data.tabla_notas_arn
+  instance_type               = var.instance_type
+  asg_min                     = var.asg_min
+  asg_max                     = var.asg_max
+  asg_deseado                 = var.asg_deseado
+  habilitar_agente_cloudwatch = var.habilitar_agente_cloudwatch
 }
 
 module "messaging" {

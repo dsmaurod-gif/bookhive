@@ -77,3 +77,9 @@ variable "puerto_app" {
   type        = number
   default     = 3000
 }
+
+variable "habilitar_agente_cloudwatch" {
+  description = "Instala el agente de CloudWatch en las instancias EC2 Sync"
+  type        = bool
+  default     = true
+}

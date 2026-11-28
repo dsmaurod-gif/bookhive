@@ -90,3 +90,9 @@ variable "correo_demo" {
     error_message = "Debe ser un correo válido."
   }
 }
+
+variable "habilitar_agente_cloudwatch" {
+  description = "Instala el agente de CloudWatch en las EC2 y crea los endpoints de logs y monitoring (suman costo por hora)"
+  type        = bool
+  default     = true
+}

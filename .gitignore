@@ -39,3 +39,6 @@ __pycache__/
 
 # Ansible
 *.retry
+
+# Colecciones de Ansible Galaxy: las descarga el pipeline, no se guardan en Git
+ansible/collections/

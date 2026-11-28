@@ -13,15 +13,17 @@ bookhive/
 ├── terraform/
 │   ├── main.tf, variables.tf, outputs.tf, providers.tf, backend.tf
 │   └── modules/
-│       ├── network/     # VPC, subredes y endpoints
-│       ├── security/    # Grupos de seguridad
-│       ├── data/        # DynamoDB y Secrets Manager (Aurora opcional)
-│       ├── auth/        # Cognito
-│       ├── compute/     # ALB, Auto Scaling y EC2 Sync
-│       ├── messaging/   # SNS, SQS, DLQ, Lambda notificador y SES
-│       ├── api/         # API Gateway y Lambda api_clubes
-│       └── backup/      # AWS Backup (full diario 09:00 UTC)
-├── ansible/             # Configuración de los servidores EC2 Sync
+│       ├── network/        # VPC, subredes y endpoints
+│       ├── security/       # Grupos de seguridad
+│       ├── data/           # DynamoDB y Secrets Manager (Aurora opcional)
+│       ├── auth/           # Cognito
+│       ├── compute/        # ALB, Auto Scaling y EC2 Sync
+│       ├── messaging/      # SNS, SQS, DLQ, Lambda notificador, SES y tema de alertas
+│       ├── api/            # API Gateway y Lambda api_clubes
+│       ├── backup/         # AWS Backup (full diario 09:00 UTC)
+│       ├── observability/  # Alarmas y panel de CloudWatch
+│       └── edge/           # CloudFront y WAF
+├── ansible/             # Configuración de los EC2 Sync (roles y colecciones de Galaxy)
 ├── docs/                # Diagrama de arquitectura
 └── .github/workflows/   # Automatización con GitHub Actions
 ```

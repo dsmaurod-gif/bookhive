@@ -59,7 +59,7 @@ resource "aws_s3_object" "index" {
   bucket       = aws_s3_bucket.app.id
   key          = "index.html"
   content      = "<h1>BookHive (PMV)</h1><p>Aplicación web de ejemplo.</p>"
-  content_type = "text/html"
+  content_type = "text/html; charset=utf-8"
 }
 
 resource "random_password" "db" {

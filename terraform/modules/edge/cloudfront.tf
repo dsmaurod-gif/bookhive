@@ -17,6 +17,24 @@ resource "aws_cloudfront_origin_access_control" "app" {
   signing_protocol                  = "sigv4"
 }
 
+resource "aws_cloudfront_function" "quitar_prefijo_api" {
+  name    = "${local.prefijo}-quitar-prefijo-api"
+  runtime = "cloudfront-js-2.0"
+  comment = "Quita el prefijo /api para que la ruta coincida con la API de API Gateway"
+  publish = true
+
+  code = <<-EOT
+    function handler(event) {
+      var request = event.request;
+      request.uri = request.uri.replace(/^\/api/, "");
+      if (request.uri === "") {
+        request.uri = "/";
+      }
+      return request;
+    }
+  EOT
+}
+
 resource "aws_cloudfront_distribution" "borde" {
   # checkov:skip=CKV_AWS_86:Sin registro de acceso en el PMV para evitar costo de almacenamiento
   # checkov:skip=CKV_AWS_310:Sin segundo origen de conmutacion; una sola region en el PMV
@@ -78,6 +96,11 @@ resource "aws_cloudfront_distribution" "borde" {
     cached_methods           = ["GET", "HEAD"]
     cache_policy_id          = data.aws_cloudfront_cache_policy.sin_cache.id
     origin_request_policy_id = data.aws_cloudfront_origin_request_policy.todo_menos_host.id
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.quitar_prefijo_api.arn
+    }
   }
 
   ordered_cache_behavior {

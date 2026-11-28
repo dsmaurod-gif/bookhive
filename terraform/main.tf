@@ -105,3 +105,18 @@ module "observability" {
   tabla_notas_nombre        = module.data.tabla_notas_nombre
   dlq_nombre                = module.messaging.dlq_nombre
 }
+
+module "edge" {
+  source = "./modules/edge"
+
+  providers = {
+    aws.virginia = aws.virginia
+  }
+
+  proyecto     = var.proyecto
+  entorno      = var.entorno
+  region       = var.region
+  bucket_app   = module.data.bucket_app
+  api_url      = module.api.api_url
+  alb_dns_name = module.compute.alb_dns_name
+}

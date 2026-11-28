@@ -24,6 +24,7 @@ resource "aws_cloudfront_distribution" "borde" {
   # checkov:skip=CKV_AWS_174:Sin dominio propio se usa el certificado por defecto de CloudFront (TLS minimo 1.0); limitacion declarada
   # checkov:skip=CKV2_AWS_42:Sin dominio propio no hay certificado ACM personalizado; se usa el certificado por defecto de CloudFront
   # checkov:skip=CKV_AWS_374:BookHive atiende a migrantes en muchos paises y husos horarios; restringir por pais contradice el objetivo del producto
+  # checkov:skip=CKV2_AWS_47:Falso positivo de Checkov; el WAF asociado ya incluye AWSManagedRulesKnownBadInputsRuleSet en waf.tf (CKV_AWS_192 aprobado)
   enabled             = true
   default_root_object = "index.html"
   web_acl_id          = aws_wafv2_web_acl.borde.arn
